@@ -52,6 +52,14 @@ body {
     display: block;
 }
 
+.btn.disabled {
+    background-color: grey;
+}
+
+.btn.disabled:hover {
+    background-color: grey;
+}
+
 .header h1::before,
 .header h1::after {
     display: block;

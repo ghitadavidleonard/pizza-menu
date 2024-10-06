@@ -1,9 +1,17 @@
-import React, { StrictMode, CSSProperties, useState, useEffect } from "react";
+import React, { StrictMode, useState, useEffect } from "react";
 import { createRoot } from "react-dom/client";
 import { OPEN_HOUR, CLOSE_HOUR } from "./utils/constants";
 import "./index.css";
 
-const pizzaData = [
+type PizzaObj = {
+    name: string;
+    ingredients: string;
+    price: number;
+    photoName: string;
+    soldOut: boolean;
+};
+
+const pizzaData: PizzaObj[] = [
     {
         name: "Focaccia",
         ingredients: "Bread with italian olive oil and rosemary",
@@ -67,46 +75,114 @@ function Header() {
     const style = {};
 
     return (
-        <header className="header">
+        <header className="header footer">
             <h1 style={style}>Pizza Divado CO.</h1>
         </header>
     );
 }
 
 function Menu() {
+    const pizzas = pizzaData;
+    //const pizzas: PizzaObj[] = [];
+    const numPizzas = pizzas.length;
+
     return (
         <main className="menu">
             <h2>Our menu</h2>
-            {pizzaData.map((pd) => (
-                <Pizza />
-            ))}
+            {numPizzas > 0 ? (
+                <>
+                    <p>
+                        Authentic Italian cuisine. 6 creative dishes to choose
+                        from. All from our stone over, all organic, all
+                        delicious.
+                    </p>
+                    <ul className="pizzas">
+                        {pizzas.map((pz) => {
+                            return <Pizza key={pz.name} {...pz} />;
+                        })}
+                    </ul>
+                </>
+            ) : (
+                <p>
+                    We're still working on our menu. Please come back later :)
+                </p>
+            )}
         </main>
+    );
+}
+
+type PizzaProps = {
+    name: string;
+    photoName: string;
+    ingredients: string;
+    price: number;
+    soldOut: boolean;
+};
+
+function Pizza({ photoName, ingredients, name, price, soldOut }: PizzaProps) {
+    return (
+        <li className={`pizza${soldOut ? " sold-out" : ""}`}>
+            <img src={photoName} alt={name} />
+            <div>
+                <h3>{name}</h3>
+                <p>{ingredients}</p>
+
+                {/* {soldOut ? <span>SOLD OUT</span> : <span>{price}</span>} */}
+
+                <span>{soldOut ? "SOLD OUT" : price}</span>
+            </div>
+        </li>
     );
 }
 
 function Footer() {
     const hour = new Date().getHours();
     const isOpen = hour >= OPEN_HOUR && hour <= CLOSE_HOUR;
-    console.log(isOpen);
 
+    return (
+        <footer className="footer">
+            <Order isOpen={isOpen} />
+        </footer>
+    );
+    //return React.createElement("footer", null, "We're currently open");
+}
+
+type OrderProps = {
+    isOpen: boolean;
+};
+
+function Order({ isOpen }: OrderProps) {
+    return (
+        <div className="order">
+            {isOpen ? (
+                <p>
+                    {<CurrentTime />} We're open until {CLOSE_HOUR}:00! Come
+                    visit us or order online.
+                </p>
+            ) : (
+                <p>
+                    {<CurrentTime />} We're currently closed until {OPEN_HOUR}
+                    :00!
+                </p>
+            )}
+            <button
+                disabled={!isOpen}
+                className={`btn ${isOpen ? "" : "disabled"}`}
+            >
+                Order
+            </button>
+        </div>
+    );
+}
+
+function CurrentTime() {
     const [time, setTime] = useState(new Date().toLocaleTimeString());
 
     useEffect(() => {
         setInterval(() => setTime(new Date().toLocaleTimeString()), 1000);
     }, []);
 
-    return <footer className="footer">{time}. We're currently open!</footer>;
-    //return React.createElement("footer", null, "We're currently open");
-}
-
-function Pizza() {
-    return (
-        <>
-            <h3>Pizza Spinaci</h3>
-            <p>Tomato, mozarella, spinach, and ricotta cheese</p>
-            <img src="pizzas/spinaci.jpg" alt="Pizza Spinaci" />
-        </>
-    );
+    return <>{time}</>;
 }
 
 // The way that we render our app in the DOM in react version 18;

@@ -1,2 +1,2 @@
-export const OPEN_HOUR: number = 12;
+export const OPEN_HOUR: number = 8;
 export const CLOSE_HOUR: number = 22;
